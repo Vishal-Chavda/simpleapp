@@ -4,9 +4,11 @@ orbs:
 
 jobs:
   example-job:
-    docker:
+    machine: true
+    resource_class: vishal-chavda/cicdrunner
+#    docker:
       # replace with your preferred image
-      - image: cimg/base:stable
+#      - image: cimg/base:stable
     steps:
       - checkout
       - setup_remote_docker:
