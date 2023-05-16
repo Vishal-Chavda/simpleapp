@@ -1,16 +1,26 @@
 version: 2.1
-executors:
-  default:
-    working_directory: ~/app
+orbs:
+  docker: circleci/docker@1.7.0
 
 jobs:
-  dockerize:
-    executor: default
+  example-job:
+    docker:
+      # replace with your preferred image
+      - image: cimg/base:stable
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 20.10.7
       - run:
-          name: Build Docker image
+          name: Build docker image
           command: |
-            docker build -t simpleapp:${CIRCLE_SHA1} .
+            docker build -t simpleapp .
+#      - docker/build:
+#          attach-at: ./ 
+#          debug: false 
+#          docker-context: ./ 
+#          dockerfile: dockerfile 
+#          image: node:16-alpine 
+
+workflows:
+  example-workflow:
+    jobs:
+      - example-job
