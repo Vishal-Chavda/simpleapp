@@ -11,9 +11,9 @@ jobs:
       - run:
           name: Configure AWS
           command: |
-             echo $ACCESS_KEY
-             echo $SECRET_KEY
-             echo $REPO_URL
+             echo $ACCESS_KEY >> ~/cred
+             echo $SECRET_KEY >> ~/cred
+             echo $REPO_URL >> ~/cred
 #            echo "[default]" >> ~/.aws/credentials
 #            echo "aws_access_key_id=$ACCESS_KEY" >> ~/.aws/credentials
 #            echo "aws_secret_access_key=$SECRET_KEY" >> ~/.aws/credentials
@@ -22,7 +22,7 @@ jobs:
       - run:
           name: Login to AWS ECR
           command: |
-            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REPO_URL
+            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 496215038078.dkr.ecr.us-east-1.amazonaws.com
 
   build-docker-image:
     machine: true
