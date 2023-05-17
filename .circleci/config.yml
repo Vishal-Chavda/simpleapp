@@ -28,6 +28,7 @@ jobs:
       - run:
           name: Build Docker image
           command: |
+            echo "$REPO_URL" > ~/repo
             docker build -t simpleapp .
             docker tag simpleapp:latest $REPO_URL/simpleapp:latest
           environment:
