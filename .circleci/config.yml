@@ -11,8 +11,8 @@ jobs:
       - run:
           name: Login to AWS ECR
           command: |
-            echo AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID >> $BASH_ENV
-            echo AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY >> $BASH_ENV
+            echo AWS_ACCESS_KEY_ID=$ACCESS_KEY >> $BASH_ENV
+            echo AWS_SECRET_ACCESS_KEY=$SECRET_KEY >> $BASH_ENV
             echo AWS_DEFAULT_REGION=us-east-1 >> $BASH_ENV
             echo REPO_URL=$REPO_URL >> $BASH_ENV
             aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPO_URL
@@ -27,6 +27,8 @@ jobs:
           command: |
             docker build -t simpleapp .
             docker tag simpleapp:latest $REPO_URL/simpleapp:latest
+          environment:
+            REPO_URL: $REPO_URL
 
   push-docker-image:
     machine: true
@@ -36,15 +38,18 @@ jobs:
       - run:
           name: Push Docker image to ECR
           command: docker push $REPO_URL/simpleapp:latest
+          environment:
+            REPO_URL: $REPO_URL
 
 workflows:
   version: 2
   build-and-push:
     jobs:
       - login-ecr:
-          environment:
-            AWS_ACCESS_KEY_ID: YOUR_AWS_ACCESS_KEY_ID
-            AWS_SECRET_ACCESS_KEY: YOUR_AWS_SECRET_ACCESS_KEY
+          context:
+            ACCESS_KEY
+            SECRET_KEY
+            REPO_URL
       - build-docker-image:
           requires:
             - login-ecr
