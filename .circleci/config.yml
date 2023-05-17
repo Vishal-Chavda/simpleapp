@@ -33,7 +33,7 @@ jobs:
           name: Build Docker image
           command: |
             docker build -t simpleapp .
-            docker tag simpleapp:latest $REPO_URL/simpleapp:latest
+            docker tag simpleapp:latest 496215038078.dkr.ecr.us-east-1.amazonaws.com/simpleapp:latest
           environment:
             REPO_URL: $REPO_URL
 
@@ -44,7 +44,7 @@ jobs:
       - checkout
       - run:
           name: Push Docker image to ECR
-          command: docker push $REPO_URL/simpleapp:latest
+          command: docker push 496215038078.dkr.ecr.us-east-1.amazonaws.com/simpleapp:latest
           environment:
             REPO_URL: $REPO_URL
 
@@ -54,9 +54,7 @@ workflows:
     jobs:
       - login-ecr:
           context:
-            ACCESS_KEY
-            SECRET_KEY
-            REPO_URL
+            - AWS            
       - build-docker-image:
           requires:
             - login-ecr
