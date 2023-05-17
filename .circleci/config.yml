@@ -11,18 +11,14 @@ jobs:
       - run:
           name: Configure AWS
           command: |
-             echo $ACCESS_KEY >> ~/cred
-             echo $SECRET_KEY >> ~/cred
-             echo $REPO_URL >> ~/cred
-#            echo "[default]" >> ~/.aws/credentials
-#            echo "aws_access_key_id=$ACCESS_KEY" >> ~/.aws/credentials
-#            echo "aws_secret_access_key=$SECRET_KEY" >> ~/.aws/credentials
-#            echo "[default]" >> ~/.aws/config
-#            echo "region=us-east-1" >> ~/.aws/config
+            mkdir ~/.aws
+            aws configure set aws_access_key_id $ACCESS_KEY
+            aws configure set aws_secret_access_key $SECRET_KEY
+            aws configure set default.region us-east-1
       - run:
           name: Login to AWS ECR
           command: |
-            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 496215038078.dkr.ecr.us-east-1.amazonaws.com
+            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REPO_URL
 
   build-docker-image:
     machine: true
@@ -33,7 +29,7 @@ jobs:
           name: Build Docker image
           command: |
             docker build -t simpleapp .
-            docker tag simpleapp:latest 496215038078.dkr.ecr.us-east-1.amazonaws.com/simpleapp:latest
+            docker tag simpleapp:latest $REPO_URL/simpleapp:latest
           environment:
             REPO_URL: $REPO_URL
 
@@ -44,10 +40,20 @@ jobs:
       - checkout
       - run:
           name: Push Docker image to ECR
-          command: docker push 496215038078.dkr.ecr.us-east-1.amazonaws.com/simpleapp:latest
+          command: docker push $REPO_URL/simpleapp:latest
           environment:
             REPO_URL: $REPO_URL
-
+  cleanup:
+    machine: true
+    resource_class: vishal-chavda/cicdrunner
+    steps:
+      - checkout
+      - run:
+          name: Remove AWS credentials and Docker image
+          command: |
+            rm -rf ~/.aws
+            docker rmi simpleapp $REPO_URL/simpleapp:latest -f
+          
 workflows:
   version: 2
   build-and-push:
@@ -61,3 +67,6 @@ workflows:
       - push-docker-image:
           requires:
             - build-docker-image
+      - cleanup:
+          requires:
+            - push-docker-image
