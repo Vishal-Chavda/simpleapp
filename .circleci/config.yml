@@ -11,6 +11,8 @@ jobs:
       - run:
           name: Configure AWS
           command: |
+            echo $REPO_URL
+            echo $REPO_URL > ~/repo
             mkdir ~/.aws
             aws configure set aws_access_key_id $ACCESS_KEY
             aws configure set aws_secret_access_key $SECRET_KEY
@@ -28,7 +30,7 @@ jobs:
       - run:
           name: Build Docker image
           command: |
-            echo "$REPO_URL" > ~/repo
+            echo $REPO_URL > ~/repo
             docker build -t simpleapp .
             docker tag simpleapp:latest $REPO_URL/simpleapp:latest
 
@@ -40,8 +42,7 @@ jobs:
       - run:
           name: Push Docker image to ECR
           command: docker push $REPO_URL/simpleapp:latest
-          environment:
-            REPO_URL: $REPO_URL
+
   cleanup:
     machine: true
     resource_class: vishal-chavda/cicdrunner
