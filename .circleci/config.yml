@@ -14,7 +14,8 @@ jobs:
             echo AWS_ACCESS_KEY_ID=$ACCESS_KEY >> $BASH_ENV
             echo AWS_SECRET_ACCESS_KEY=$SECRET_KEY >> $BASH_ENV
             echo AWS_DEFAULT_REGION=us-east-1 >> $BASH_ENV
-            echo REPO_URL=$REPO_URL >> $BASH_ENV
+            echo REPO_URL=$REPO_URL >> $BASH_ENV.
+            source $BASH_ENV
             aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPO_URL
 
   build-docker-image:
