@@ -19,7 +19,7 @@ jobs:
       - run:
           name: Login to AWS ECR
           command: |
-            aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPO_URL
+            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REPO_URL
 
   build-docker-image:
     machine: true
