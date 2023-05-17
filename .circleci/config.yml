@@ -3,28 +3,51 @@ orbs:
   docker: circleci/docker@1.7.0
 
 jobs:
-  example-job:
+  login-ecr:
     machine: true
     resource_class: vishal-chavda/cicdrunner
-#    docker:
-      # replace with your preferred image
-#      - image: cimg/base:stable
     steps:
       - checkout
-#      - setup_remote_docker:
-#          version: 20.10.7
       - run:
-          name: Build docker image
+          name: Login to AWS ECR
+          command: |
+            echo AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID >> $BASH_ENV
+            echo AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY >> $BASH_ENV
+            echo AWS_DEFAULT_REGION=us-east-1 >> $BASH_ENV
+            echo REPO_URL=$REPO_URL >> $BASH_ENV
+            aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPO_URL
+
+  build-docker-image:
+    machine: true
+    resource_class: vishal-chavda/cicdrunner
+    steps:
+      - checkout
+      - run:
+          name: Build Docker image
           command: |
             docker build -t simpleapp .
-#      - docker/build:
-#          attach-at: ./ 
-#          debug: false 
-#          docker-context: ./ 
-#          dockerfile: dockerfile 
-#          image: node:16-alpine 
+            docker tag simpleapp:latest $REPO_URL/simpleapp:latest
+
+  push-docker-image:
+    machine: true
+    resource_class: vishal-chavda/cicdrunner
+    steps:
+      - checkout
+      - run:
+          name: Push Docker image to ECR
+          command: docker push $REPO_URL/simpleapp:latest
 
 workflows:
-  example-workflow:
+  version: 2
+  build-and-push:
     jobs:
-      - example-job
+      - login-ecr:
+          environment:
+            AWS_ACCESS_KEY_ID: YOUR_AWS_ACCESS_KEY_ID
+            AWS_SECRET_ACCESS_KEY: YOUR_AWS_SECRET_ACCESS_KEY
+      - build-docker-image:
+          requires:
+            - login-ecr
+      - push-docker-image:
+          requires:
+            - build-docker-image
