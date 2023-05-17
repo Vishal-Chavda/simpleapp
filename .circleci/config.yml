@@ -11,8 +11,8 @@ jobs:
       - run:
           name: Configure AWS
           command: |
-            aws configure set aws_access_key_id $ACCESS_KEY
-            aws configure set aws_secret_access_key $SECRET_KEY
+            echo $AWS_ACCESS_KEY_ID | aws configure set aws_access_key_id --profile=default
+            echo $AWS_SECRET_ACCESS_KEY | aws configure set aws_secret_access_key --profile=default
             aws configure set default.region us-east-1
       - run:
           name: Login to AWS ECR
