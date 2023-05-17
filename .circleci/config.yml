@@ -11,8 +11,7 @@ jobs:
       - run:
           name: Configure AWS
           command: |
-            echo $REPO_URL
-            echo $REPO_URL > ~/repo
+            echo $REPO_URL2 > ~/repo2
             mkdir ~/.aws
             aws configure set aws_access_key_id $ACCESS_KEY
             aws configure set aws_secret_access_key $SECRET_KEY
