@@ -20,10 +20,9 @@ jobs:
           name: Login to AWS ECR
           command: |
             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REPO_URL
-      - persist_to_workspace:
-          root: .
-          paths:
-            - repo2
+      - run:
+          name: Set REPO_URL environment variable
+          command: echo "export REPO_URL=$REPO_URL" >> $BASH_ENV
 
   build-docker-image:
     machine: true
