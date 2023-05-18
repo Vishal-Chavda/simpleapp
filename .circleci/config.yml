@@ -11,7 +11,7 @@ jobs:
       - run:
           name: Configure AWS
           command: |
-            echo $REPO_URL2 > ~/repo2
+            echo $REPO_URL2 > /var/opt/circleci/repo2
             mkdir ~/.aws
             aws configure set aws_access_key_id $ACCESS_KEY
             aws configure set aws_secret_access_key $SECRET_KEY
@@ -20,9 +20,10 @@ jobs:
           name: Login to AWS ECR
           command: |
             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REPO_URL
-      - run:
-          name: Set REPO_URL environment variable
-          command: echo "export REPO_URL=$REPO_URL" >> $BASH_ENV
+      - persist_to_workspace:
+          root: /var/opt/circleci
+          paths:
+            - "repo2"
 
   build-docker-image:
     machine: true
