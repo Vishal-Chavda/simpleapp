@@ -20,6 +20,10 @@ jobs:
           name: Login to AWS ECR
           command: |
             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REPO_URL
+      - persist_to_workspace:
+          root: .
+          paths:
+            - repo2
 
   build-docker-image:
     machine: true
